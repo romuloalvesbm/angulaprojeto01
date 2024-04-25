@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../environments/environment';
+import { ClientesService } from '../services/clientes.service';
 
 interface Cliente {
+  idCliente: number,
   nome: string;
   email: string;
   cpf: string;
@@ -21,26 +21,33 @@ export class ConsultaClientesComponent implements OnInit {
   //clientes: Cliente[] = [];
   clientes: Cliente[] = []; //JSON array
 
+  cliente: Cliente = {
+    idCliente: 0,
+    nome: '',
+    email: '',
+    cpf: '',
+    dataCriacao: new Date()
+  };
+
   //armazenar o numero de pagina que sendo acessada no componente de paginação
   page = 1;
 
-  constructor(private httpClient: HttpClient) { }
+  constructor(private clientesService: ClientesService) { }
 
   ngOnInit(): void {
     this.consultarClientes();
   }
 
   //função para executar a consultar de clientes na API
-  consultarClientes(): void {    
-    this.httpClient.get<{ data: Cliente[] }>(environment.apiUrl + "/api/clientes")
+  consultarClientes(): void {
+    this.clientesService.getAll()
       .subscribe(//promisse da API
         (response: any) => {//Obtendo o retorno de sucesso da API [anterior any[]]
           //this.clientes = data; [anterior]
           this.clientes = response.data;
-          console.log(this.clientes);
         },
         e => {//Obtendo o retorno de erro da API
-          
+          console.log(e);
         }
       )
   }
@@ -49,5 +56,21 @@ export class ConsultaClientesComponent implements OnInit {
   //componente ngx-pagination
   handlePageChange(event: number) {
     this.page = event; // Atualiza a página atual com o número da página fornecida pelo eventos    
+  }
+
+  obterCliente(idCliente: number): void {
+
+    this.clientesService.getById(idCliente)
+      .subscribe(
+        (response: any) => {
+
+          console.log(response);
+          this.cliente = response.data[0];
+        },
+        e => {
+          console.log(e);
+        }
+      );
+
   }
 }

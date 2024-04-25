@@ -42,7 +42,7 @@
                 <div class="col-md-3">
                     <div class="form-group">
                         <label>CPF:</label>
-                        <input type="text" name="cpf" class="form-control" ngModel placeholder="Ex: 12345678900" />
+                        <input type="text" name="cpf" class="form-control" ngModel placeholder="Ex: 12345678900" mask="000.000.000-00" />
                         <div *ngFor="let item of errors.Cpf" class="text-danger">
                             <small><i class="fa fa-exclamation-circle"></i> {{item}}</small>
                         </div>

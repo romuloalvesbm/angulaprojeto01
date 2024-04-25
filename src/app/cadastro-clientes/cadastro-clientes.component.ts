@@ -1,14 +1,20 @@
-import { Component, OnInit } from '@angular/core';
-import { NgForm } from '@angular/forms'; // Importe NgForm
-import { HttpClient } from '@angular/common/http'; //[Anterior não precisa]
-import { environment } from '../../environments/environment';
+import { Component } from '@angular/core';
+import { NgForm } from '@angular/forms'; // Importe NgForm [Anterior não precisa]
+import { ClientesService } from '../services/clientes.service';
+
+// Especificando os tipos de dados dos atributos
+interface Cliente {
+  cpf: string;
+  nome: string;
+  email: string;
+}
 
 @Component({
   selector: 'app-cadastro-clientes',
   templateUrl: './cadastro-clientes.component.html',
   styleUrls: ['./cadastro-clientes.component.css']
 })
-export class CadastroClientesComponent implements OnInit {
+export class CadastroClientesComponent {
 
   //atributos
   mensagem_sucesso: string = '';
@@ -21,10 +27,7 @@ export class CadastroClientesComponent implements OnInit {
 
 
   //declarando uma variavel chamada httpClient por meio injeção de dependencia 
-  constructor(private httpClient: HttpClient) { }
-
-  ngOnInit(): void {
-  }
+  constructor(private clientesService: ClientesService) { }
 
   // Função executada no evento (submit) do formulário
   cadastrarCliente(formCadastro: NgForm): void { // Especifique o tipo como NgForm ||| codigo anterior [cadastrarCliente(formCadastro): void]
@@ -33,27 +36,14 @@ export class CadastroClientesComponent implements OnInit {
 
     // Capturando os campos do formulário
     const { nome, email, cpf } = formCadastro.form.value;
-
-    // Especificando os tipos de dados dos atributos
-    interface Cliente {
-      cpf: string;
-      nome: string;
-      email: string;
-    }
-
-    // Criando a variável do tipo Cliente e pegando os valores do formulário
-    const cliente: Cliente = {
-      cpf: cpf,
-      nome: nome,
-      email: email
-    };
-
+    const cliente: Cliente = { cpf, nome, email }; // passando as informações para a variavel
+    
     // Enviando uma requisição HTTP POST para uma API
-    this.httpClient.post(environment.apiUrl + '/api/clientes', cliente)
+    this.clientesService.create(cliente)
       .subscribe(
-        (data: any) => { // Sucesso!
-
-          this.mensagem_sucesso = data.mensagemSucesso;
+        (response: any) => { // Sucesso!
+         
+          this.mensagem_sucesso = response.message;
           //limpar os campos do formuário (reset)
           formCadastro.form.reset();
         },
